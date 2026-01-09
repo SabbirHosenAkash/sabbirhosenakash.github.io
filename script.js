@@ -1,84 +1,176 @@
-// Menu Toggle
-document.querySelector(".menu-button").addEventListener("click", function () {
-    let menu = document.querySelector(".menu");
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
-});
-
-// Typing Effect
-const textArray = ["Bangladeshi Musician", "Writer", "Web Developer", "SEO Expert"];
+// --- 1. Typing Effect (Hero Section) ---
+const textArray = ["Bangladeshi Musician", "Creative Writer", "Web Developer", "SEO Expert"];
 let textIndex = 0;
 let charIndex = 0;
-const typingSpeed = 100;
-const erasingSpeed = 50;
-const typingElement = document.getElementById("typing-effect");
+let isDeleting = false;
 
-function type() {
-    if (charIndex < textArray[textIndex].length) {
-        typingElement.innerHTML += textArray[textIndex].charAt(charIndex);
-        charIndex++;
-        setTimeout(type, typingSpeed);
-    } else {
-        setTimeout(erase, 1500);
-    }
-}
+function typeEffect() {
+    const typingElement = document.getElementById("typing-effect");
+    if (!typingElement) return;
 
-function erase() {
-    if (charIndex > 0) {
-        typingElement.innerHTML = textArray[textIndex].substring(0, charIndex - 1);
+    const currentText = textArray[textIndex];
+
+    if (isDeleting) {
+        typingElement.textContent = currentText.substring(0, charIndex - 1);
         charIndex--;
-        setTimeout(erase, erasingSpeed);
     } else {
-        textIndex = (textIndex + 1) % textArray.length;
-        setTimeout(type, 500);
+        typingElement.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
     }
+
+    let typeSpeed = isDeleting ? 80 : 150;
+
+    if (!isDeleting && charIndex === currentText.length) {
+        isDeleting = true;
+        typeSpeed = 2000; // লেখা শেষে ২ সেকেন্ড বিরতি
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        textIndex = (textIndex + 1) % textArray.length;
+        typeSpeed = 500;
+    }
+
+    setTimeout(typeEffect, typeSpeed);
 }
 
-document.addEventListener("DOMContentLoaded", () => setTimeout(type, 1000));
+// --- 2. AJAX Contact Form (Success Message without Redirect) ---
+const contactForm = document.getElementById('contact-form');
+const formStatus = document.getElementById('form-status');
+const submitBtn = document.getElementById('submit-btn');
+const btnText = document.getElementById('btn-text');
 
-// Background Color Changer
-const colors = ["#ff5733", "#33ff57", "#3357ff", "#ff33f6", "#f3ff33", "#33fff3", "#ffffff", "#000000", "#555555", "#8a2be2"];
-document.querySelector(".color-selector").addEventListener("click", function () {
-    let randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.body.style.backgroundColor = randomColor;
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // পেজ রিফ্রেশ হওয়া বন্ধ করবে
+
+        // বাটন লোডিং স্টেট
+        submitBtn.disabled = true;
+        btnText.textContent = "Sending...";
+
+        const formData = new FormData(this);
+        
+        // FormSubmit.co এর AJAX এপিআই ব্যবহার করে মেসেজ পাঠানো
+        fetch("https://formsubmit.co/ajax/info.sabbirhosenakash@gmail.com", {
+            method: "POST",
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // সফলভাবে মেসেজ গেলে যা হবে
+            formStatus.style.display = "block";
+            formStatus.className = "success";
+            formStatus.textContent = "✔ Message Sent Successfully!";
+            contactForm.reset(); // ফর্ম খালি করে দিবে
+            btnText.textContent = "Send Message";
+            submitBtn.disabled = false;
+            
+            // ৫ সেকেন্ড পর মেসেজটি চলে যাবে
+            setTimeout(() => { formStatus.style.display = "none"; }, 5000);
+        })
+        .catch(error => {
+            // এরর হলে যা হবে
+            formStatus.style.display = "block";
+            formStatus.className = "error";
+            formStatus.textContent = "❌ Oops! Something went wrong.";
+            btnText.textContent = "Try Again";
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+// --- 3. Initialize AOS (Scroll Animation) ---
+AOS.init({
+    duration: 1000,
+    once: true,
+    mirror: false
 });
 
-// Smooth Page Load Animation
+// --- 4. Swiper JS (Project Slider) ---
+const swiper = new Swiper('.project-slider', {
+    loop: true,
+    autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+    },
+    effect: 'coverflow',
+    grabCursor: true,
+    centeredSlides: true,
+    slidesPerView: 'auto',
+    coverflowEffect: {
+        rotate: 50,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
+    },
+});
+
+// --- 5. 3D Skill Bar Animation on Scroll ---
+const skillSection = document.getElementById('skills');
+const progressBars = document.querySelectorAll('.fill-3d');
+
+function showProgress() {
+    progressBars.forEach(progressBar => {
+        const value = progressBar.style.getPropertyValue('--width');
+        progressBar.style.width = value;
+    });
+}
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            showProgress();
+        }
+    });
+}, { threshold: 0.5 });
+
+if (skillSection) {
+    observer.observe(skillSection);
+}
+
+// --- 6. Mobile Menu Logic ---
+function toggleMenu() {
+    const navLinks = document.getElementById('nav-links');
+    navLinks.classList.toggle('active');
+}
+
+// মেনু লিঙ্কে ক্লিক করলে মেনু ক্লোজ হওয়া
+document.querySelectorAll('#nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('nav-links').classList.remove('active');
+    });
+});
+
+// --- 7. Particles JS Config ---
+if (typeof particlesJS !== 'undefined') {
+    particlesJS("particles-js", {
+        "particles": {
+            "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": "#00ff88" },
+            "shape": { "type": "circle" },
+            "opacity": { "value": 0.5, "random": true },
+            "size": { "value": 3, "random": true },
+            "line_linked": { "enable": true, "distance": 150, "color": "#00ff88", "opacity": 0.2, "width": 1 },
+            "move": { "enable": true, "speed": 3, "direction": "none", "random": false, "straight": false, "out_mode": "out" }
+        },
+        "interactivity": {
+            "detect_on": "canvas",
+            "events": { 
+                "onhover": { "enable": true, "mode": "grab" }, 
+                "onclick": { "enable": true, "mode": "push" } 
+            }
+        },
+        "retina_detect": true
+    });
+}
+
+// --- 8. Page Initializer ---
 document.addEventListener("DOMContentLoaded", () => {
-    document.body.classList.add("loaded");
-    document.querySelectorAll(".animate-box").forEach(box => {
-        box.style.opacity = "1";
-        box.style.transform = "translateY(0)";
-    });
-});
-
-// 3D Box Hover Effect
-document.querySelectorAll(".service-box, .education-box, .book-box, .contact-box").forEach(box => {
-    box.addEventListener("mousemove", (e) => {
-        let { offsetX: x, offsetY: y } = e;
-        let { clientWidth: width, clientHeight: height } = box;
-        let moveX = (x - width / 2) / 25;
-        let moveY = (y - height / 2) / 25;
-        box.style.transform = `rotateY(${moveX}deg) rotateX(${moveY}deg)`;
-    });
-
-    box.addEventListener("mouseleave", () => {
-        box.style.transform = "rotateY(0) rotateX(0)";
-    });
-});
-
-
-document.getElementById("contact-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-    fetch(this.action, {
-        method: this.method,
-        body: new FormData(this),
-        headers: {
-            'Accept': 'application/json'
-        }
-    }).then(response => {
-        if (response.ok) {
-            document.getElementById("success-message").style.display = "block";
-            this.reset();
-        }
-    });
+    setTimeout(typeEffect, 1000);
 });
