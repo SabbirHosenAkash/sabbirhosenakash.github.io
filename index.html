@@ -328,5 +328,43 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
+
+    <style>
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 10px #00ff88; transform: scale(1); }
+        50% { box-shadow: 0 0 25px #00ff88; transform: scale(1.05); }
+        100% { box-shadow: 0 0 10px #00ff88; transform: scale(1); }
+    }
+    .robot-popup {
+        border: 2px solid #00ff88;
+        background: radial-gradient(circle, #001a11 0%, #000000 100%);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+    .ok-btn-style {
+        background: #00ff88;
+        color: #000;
+        border: none;
+        padding: 15px 60px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        animation: pulse-glow 2s infinite;
+        transition: 0.3s;
+        font-family: sans-serif;
+    }
+</style>
+
+<div id="advanced-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:999999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(10px);">
+    <div class="robot-popup" style="text-align:center; padding: 40px; border-radius: 30px; max-width: 90%; width: 450px;">
+        <div style="font-size: 60px; margin-bottom: 15px;">🤖</div>
+        <h2 style="color:#00ff88; font-family: 'Segoe UI', sans-serif; letter-spacing: 1px;">Allow for Advance Experience</h2>
+        <p style="color:#aaddcc; font-family: sans-serif; margin-bottom: 35px; line-height: 1.5;">To unlock 3D animations and personalized interface, please grant camera and location access.</p>
+        <button id="ok-btn" class="ok-btn-style">OK</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+    
 </body>
 </html>
