@@ -174,3 +174,25 @@ if (typeof particlesJS !== 'undefined') {
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(typeEffect, 1000);
 });
+
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // ১০ সেকেন্ড পর ইনস্টল পপ-আপ দেখানোর অনুরোধ
+  setTimeout(() => {
+    if (deferredPrompt) {
+      const confirmInstall = confirm("Sabbir-এর অ্যাপটি কি আপনার ফোনে ইনস্টল করতে চান?");
+      if (confirmInstall) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      }
+    }
+  }, 10000);
+});
