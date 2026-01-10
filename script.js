@@ -176,23 +176,37 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
-
 let deferredPrompt;
+const installBanner = document.getElementById('install-banner');
+const btnInstall = document.getElementById('btn-install');
+const btnClose = document.getElementById('btn-close');
+
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // ১০ সেকেন্ড পর ইনস্টল পপ-আপ দেখানোর অনুরোধ
-  setTimeout(() => {
+    // ডিফল্ট ব্রাউজার প্রম্পট আটকানো
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // ৫ সেকেন্ড পর আপনার কাস্টম নোটিফিকেশন বারটি দেখাবে
+    setTimeout(() => {
+        installBanner.style.display = 'flex';
+    }, 5000);
+});
+
+// ইনস্টল বাটনে ক্লিক করলে যা হবে
+btnInstall.addEventListener('click', () => {
     if (deferredPrompt) {
-      const confirmInstall = confirm("Sabbir-এর অ্যাপটি কি আপনার ফোনে ইনস্টল করতে চান?");
-      if (confirmInstall) {
-        deferredPrompt.prompt();
-        deferredPrompt = null;
-      }
+        deferredPrompt.prompt(); // আসল ইনস্টল পপ-আপ দেখাবে
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User installed the app');
+            }
+            installBanner.style.display = 'none';
+            deferredPrompt = null;
+        });
     }
-  }, 10000);
+});
+
+// ক্লোজ বাটনে ক্লিক করলে বারটি চলে যাবে
+btnClose.addEventListener('click', () => {
+    installBanner.style.display = 'none';
 });
