@@ -211,4 +211,5 @@ btnClose.addEventListener('click', () => {
     installBanner.style.display = 'none';
 });
 
-
+window.addEventListener('online', () => alert('আপনি এখন অনলাইনে আছেন!'));
+window.addEventListener('offline', () => alert('আপনার ইন্টারনেট সংযোগ বিচ্ছিন্ন হয়েছে।'));
