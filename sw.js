@@ -1,49 +1,32 @@
-const cacheName = 'writarion-v1';
-const assets = ['/', '/index.html', '/style.css', '/script.js'];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(assets)));
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
-});
-
-
-const cacheName = 'writarion-v1';
-// এখানে আপনার সাইটের সব গুরুত্বপূর্ণ ফাইলের নাম দিন
+const cacheName = 'writarion-v2'; // ভার্সন আপডেট করা হয়েছে
 const assets = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/sabbir.png',
-  '/favicon-32x32.png',
-  '/android-chrome-192x192.png',
-  '/android-chrome-512x512.png'
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './sabbir.png',
+  './favicon-32x32.png',
+  './android-chrome-192x192.png',
+  './android-chrome-512x512.png'
 ];
 
-// ১. ফাইলগুলো ক্যাশ মেমোরিতে সেভ করা (Installation)
+// ১. ইন্সটলেশন এবং ফাইল ক্যাশ করা
 self.addEventListener('install', (e) => {
+  self.skipWaiting(); // নতুন সার্ভিস ওয়ার্কার সাথে সাথে একটিভ হবে
   e.waitUntil(
     caches.open(cacheName).then((cache) => {
-      console.log('Caching all assets');
-      return cache.addAll(assets);
+      console.log('Caching all assets...');
+      // একে একে অ্যাড করা যাতে কোনো একটা ফাইল মিস হলে অন্যগুলো ক্যাশ হয়
+      return Promise.all(
+        assets.map(asset => {
+          return cache.add(asset).catch(err => console.error(`Failed to cache: ${asset}`, err));
+        })
+      );
     })
   );
 });
 
-// ২. অফলাইনে থাকাকালীন ক্যাশ থেকে ফাইল দেখানো (Fetching)
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      // যদি ক্যাশ-এ ফাইল থাকে তবে সেটি দেখাবে, নাহলে নেটওয়ার্ক থেকে আনবে
-      return cachedResponse || fetch(e.request);
-    })
-  );
-});
-
-// ৩. পুরনো ক্যাশ ডিলিট করা (Activation)
+// ২. অ্যাক্টিভেশন এবং পুরনো ক্যাশ ডিলিট করা
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -54,30 +37,16 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-
-const cacheName = 'portfolio-v1';
-const assets = [
-  '/',
-  '/index.html',
-  '/css/style.css', // আপনার CSS ফাইলের সঠিক পাথ দিন
-  '/js/script.js',  // আপনার JS ফাইলের সঠিক পাথ দিন
-  '/images/logo.png' // আপনার ছবির পাথ
-];
-
-// ফাইলগুলো ক্যাশ করা
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      cache.addAll(assets);
-    })
-  );
-});
-
-// অফলাইনে ফাইলগুলো প্রদর্শন করা
-self.addEventListener('fetch', e => {
+// ৩. ফেচ রিকোয়েস্ট হ্যান্ডেল করা (অফলাইন সাপোর্ট)
+self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then(res => {
-      return res || fetch(e.request);
+    caches.match(e.request).then((res) => {
+      return res || fetch(e.request).catch(() => {
+        // যদি নেটওয়ার্ক না থাকে এবং রিকোয়েস্টটি যদি পেজ হয়, তবে index.html দেখাবে
+        if (e.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+      });
     })
   );
 });
