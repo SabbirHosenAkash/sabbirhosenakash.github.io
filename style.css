@@ -245,3 +245,99 @@ footer { text-align: center; padding: 40px; border-top: 1px solid var(--border);
 .spotify-container iframe {
     display: block;
 }
+
+
+/* Meetwoyou Section */
+.meetwoyou-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+/* Left (Logo) */
+.meetwoyou-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.meetwoyou-logo {
+    width: 220px;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(0,255,136,0.4);
+    transition: 0.3s;
+}
+
+.meetwoyou-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px #00ff88;
+}
+
+/* Right Content */
+.meetwoyou-right {
+    flex: 2;
+}
+
+.meetwoyou-right h3 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.meetwoyou-right p {
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.role {
+    color: #00ff88;
+    margin-top: 5px;
+}
+
+/* Tags */
+.meetwoyou-tags {
+    margin: 15px 0;
+}
+
+.meetwoyou-tags span {
+    display: inline-block;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid #00ff88;
+    color: #00ff88;
+    padding: 5px 12px;
+    margin: 5px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* Button */
+.btn-meetwoyou {
+    display: inline-block;
+    background: linear-gradient(45deg, #00ff88, #00c3ff);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-meetwoyou:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00ff88;
+}
+
+/* Responsive */
+@media(max-width: 768px){
+    .meetwoyou-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .meetwoyou-logo {
+        width: 180px;
+    }
+}
