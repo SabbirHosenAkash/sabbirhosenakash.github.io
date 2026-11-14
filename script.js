@@ -244,48 +244,50 @@ window.addEventListener('offline', () => alert('আপনার ইন্টা�
             return;
         }
 
-        let stopped = false;
-        let timer = null;
-        const wait = (ms) => new Promise(resolve => {
-            timer = window.setTimeout(resolve, ms);
-        });
-        const type = async (element, value, speed) => {
+        let active = false;
+        let cycle = 0;
+        const wait = (ms) => new Promise(resolve => window.setTimeout(resolve, ms));
+        const type = async (element, value, speed, token) => {
             element.classList.add('typing-cursor');
-            for (let i = 1; i <= value.length && !stopped; i++) {
+            for (let i = 1; i <= value.length && active && token === cycle; i++) {
                 element.textContent = value.slice(0, i);
                 await wait(speed);
             }
             element.classList.remove('typing-cursor');
         };
-        const run = async () => {
-            while (!stopped) {
+        const play = async (token) => {
+            while (active && token === cycle) {
                 card.classList.remove('motion-dock','motion-copy','motion-clear','motion-center');
                 heading.textContent = '';
                 paragraph.textContent = '';
                 void card.offsetWidth;
                 card.classList.add('motion-center');
                 await wait(1050);
-                if (stopped) break;
+                if (!active || token !== cycle) break;
                 card.classList.add('motion-dock');
                 await wait(900);
-                if (stopped) break;
+                if (!active || token !== cycle) break;
                 card.classList.add('motion-copy');
-                await type(heading, title, 72);
+                await type(heading, title, 72, token);
                 await wait(180);
-                await type(paragraph, description, 24);
+                if (!active || token !== cycle) break;
+                await type(paragraph, description, 24, token);
                 await wait(1600);
-                if (stopped) break;
+                if (!active || token !== cycle) break;
                 card.classList.add('motion-clear');
                 await wait(650);
             }
         };
-        run();
 
-        const visibilityObserver = new IntersectionObserver((entries) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (!entry.isIntersecting) {
-                    stopped = true;
-                    window.clearTimeout(timer);
+                if (entry.isIntersecting && !active) {
+                    active = true;
+                    cycle++;
+                    play(cycle);
+                } else if (!entry.isIntersecting && active) {
+                    active = false;
+                    cycle++;
                     card.classList.remove('motion-center','motion-dock','motion-copy','motion-clear');
                     heading.textContent = title;
                     paragraph.textContent = description;
@@ -293,7 +295,7 @@ window.addEventListener('offline', () => alert('আপনার ইন্টা�
                     copy.style.transform = 'none';
                 }
             });
-        }, { threshold: 0.05 });
-        visibilityObserver.observe(card);
+        }, { threshold: 0.12 });
+        observer.observe(card);
     });
 })();
