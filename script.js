@@ -213,3 +213,87 @@ btnClose.addEventListener('click', () => {
 
 window.addEventListener('online', () => alert('আপনি এখন অনলাইনে আছেন!'));
 window.addEventListener('offline', () => alert('আপনার ইন্টারনেট সংযোগ বিচ্ছিন্ন হয়েছে।'));
+
+
+// --- 9. Service cards: centered logo -> glide to top -> colorful typewriter -> clear -> loop ---
+(() => {
+    const cards = Array.from(document.querySelectorAll('#services .service-motion-card'));
+    if (!cards.length) return;
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    cards.forEach((card) => {
+        const icon = card.querySelector('.service-motion-icon');
+        const heading = card.querySelector('h3');
+        const paragraph = card.querySelector('p');
+        if (!icon || !heading || !paragraph) return;
+
+        const title = heading.textContent.trim();
+        const description = paragraph.textContent.trim();
+        const copy = document.createElement('div');
+        copy.className = 'service-motion-copy';
+        heading.textContent = '';
+        paragraph.textContent = '';
+        copy.append(heading, paragraph);
+        card.appendChild(copy);
+
+        if (reducedMotion) {
+            heading.textContent = title;
+            paragraph.textContent = description;
+            copy.style.opacity = '1';
+            copy.style.transform = 'none';
+            return;
+        }
+
+        let stopped = false;
+        let timer = null;
+        const wait = (ms) => new Promise(resolve => {
+            timer = window.setTimeout(resolve, ms);
+        });
+        const type = async (element, value, speed) => {
+            element.classList.add('typing-cursor');
+            for (let i = 1; i <= value.length && !stopped; i++) {
+                element.textContent = value.slice(0, i);
+                await wait(speed);
+            }
+            element.classList.remove('typing-cursor');
+        };
+        const run = async () => {
+            while (!stopped) {
+                card.classList.remove('motion-dock','motion-copy','motion-clear','motion-center');
+                heading.textContent = '';
+                paragraph.textContent = '';
+                void card.offsetWidth;
+                card.classList.add('motion-center');
+                await wait(1050);
+                if (stopped) break;
+                card.classList.add('motion-dock');
+                await wait(900);
+                if (stopped) break;
+                card.classList.add('motion-copy');
+                await type(heading, title, 72);
+                await wait(180);
+                await type(paragraph, description, 24);
+                await wait(1600);
+                if (stopped) break;
+                card.classList.add('motion-clear');
+                await wait(650);
+            }
+        };
+        run();
+
+        const visibilityObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    stopped = true;
+                    window.clearTimeout(timer);
+                    card.classList.remove('motion-center','motion-dock','motion-copy','motion-clear');
+                    heading.textContent = title;
+                    paragraph.textContent = description;
+                    copy.style.opacity = '1';
+                    copy.style.transform = 'none';
+                }
+            });
+        }, { threshold: 0.05 });
+        visibilityObserver.observe(card);
+    });
+})();
