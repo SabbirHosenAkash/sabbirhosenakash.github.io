@@ -1,4 +1,4 @@
-const cacheName = 'writarion-v2'; // ভার্সন আপডেট করা হয়েছে
+const cacheName = 'writarion-v3'; // ভার্সন আপডেট করা হয়েছে
 const assets = [
   './',
   './index.html',
