@@ -341,3 +341,123 @@ footer { text-align: center; padding: 40px; border-top: 1px solid var(--border);
         width: 180px;
     }
 }
+
+
+/* --- Cinematic looping animation for the three Service cards only --- */
+#services .service-motion-card {
+    min-height: 285px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    isolation: isolate;
+}
+#services .service-motion-card::before {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(.35);
+    opacity: 0;
+    background: radial-gradient(circle, rgba(0,255,136,.22), rgba(0,136,255,.08) 48%, transparent 72%);
+    pointer-events: none;
+    z-index: -1;
+}
+#services .service-motion-card.motion-center::before {
+    animation: serviceAura 1s ease-out both;
+}
+@keyframes serviceAura {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.25); }
+    45% { opacity: 1; }
+    100% { opacity: .65; transform: translate(-50%,-50%) scale(1.35); }
+}
+#services .service-motion-card .service-motion-icon {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    transform: translate(-50%, -50%) scale(.35) rotate(-18deg);
+    opacity: 0;
+    font-size: 58px;
+    color: #00ff88;
+    filter: drop-shadow(0 0 0 rgba(0,255,136,0));
+    transition: none;
+    will-change: top, transform, opacity, filter;
+}
+#services .service-motion-card.motion-center .service-motion-icon {
+    animation: serviceIconAppear .8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+#services .service-motion-card.motion-dock .service-motion-icon {
+    top: 34px;
+    opacity: 1;
+    transform: translate(-50%, 0) scale(.72) rotate(0);
+    filter: drop-shadow(0 0 15px rgba(0,255,136,.85));
+    transition: top .85s cubic-bezier(.18,.82,.25,1), transform .85s cubic-bezier(.18,.82,.25,1), filter .5s ease;
+}
+@keyframes serviceIconAppear {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(.25) rotate(-25deg); filter: drop-shadow(0 0 0 transparent); }
+    65% { opacity: 1; transform: translate(-50%,-50%) scale(1.18) rotate(5deg); filter: drop-shadow(0 0 24px rgba(0,255,136,.95)); }
+    100% { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0); filter: drop-shadow(0 0 15px rgba(0,255,136,.75)); }
+}
+#services .service-motion-copy {
+    width: 100%;
+    margin-top: 112px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity .45s ease, transform .55s ease;
+}
+#services .service-motion-card.motion-copy .service-motion-copy {
+    opacity: 1;
+    transform: translateY(0);
+}
+#services .service-motion-copy h3 {
+    display: inline-block;
+    margin: 0 0 13px;
+    min-height: 1.4em;
+    font-weight: 700;
+    background: linear-gradient(90deg,#00ff88,#00c3ff,#c77dff,#ff7eb3,#00ff88);
+    background-size: 250% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: serviceTextShimmer 3s linear infinite;
+    text-shadow: none;
+}
+#services .service-motion-copy p {
+    margin: 0;
+    min-height: 3.4em;
+    color: #f0f0f0;
+    line-height: 1.7;
+}
+#services .service-motion-copy .typing-cursor::after {
+    content: "|";
+    display: inline-block;
+    margin-left: 2px;
+    color: #00ff88;
+    animation: serviceCursorBlink .7s steps(1) infinite;
+}
+@keyframes serviceTextShimmer { to { background-position: 250% center; } }
+@keyframes serviceCursorBlink { 50% { opacity: 0; } }
+#services .service-motion-card.motion-clear .service-motion-copy {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+@media (max-width: 600px) {
+    #services .service-motion-card { min-height: 300px; padding: 32px 24px; }
+    #services .service-motion-card .service-motion-icon { font-size: 54px; }
+    #services .service-motion-copy { margin-top: 108px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #services .service-motion-card .service-motion-icon,
+    #services .service-motion-copy h3 { animation: none !important; }
+    #services .service-motion-card .service-motion-icon {
+        position: static; opacity: 1; transform: none; margin: 0 0 18px;
+    }
+    #services .service-motion-copy { margin-top: 0; opacity: 1; transform: none; }
+    #services .service-motion-copy h3 { color: var(--primary); background: none; }
+}
